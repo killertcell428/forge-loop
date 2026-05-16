@@ -1,0 +1,12 @@
+{
+  "name": "forge-loop",
+  "version": "0.1.0",
+  "description": "Domain-rotating self-improvement loop for OSS. Skills + agent that turn Claude Code into a Research → Plan → Implement → Test → Release cycle driver.",
+  "author": {
+    "name": "killertcell428",
+    "url": "https://github.com/killertcell428"
+  },
+  "homepage": "https://github.com/killertcell428/forge-loop",
+  "repository": "https://github.com/killertcell428/forge-loop",
+  "license": "MIT"
+}

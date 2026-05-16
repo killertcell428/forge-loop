@@ -60,11 +60,16 @@ AI に「OSS を良くしておいて」と丸投げすると、暴走する。
 
 ## クイックスタート
 
-### 1. プラグインを入れる (TBD)
+### 1. プラグインを試す
+
+ローカルで:
 
 ```bash
-claude plugin install forge-loop
+git clone https://github.com/killertcell428/forge-loop
+claude --plugin-dir ./forge-loop/plugin
 ```
+
+公式仕様の `.claude-plugin/plugin.json` + `skills/<name>/SKILL.md` + `agents/<name>/AGENT.md` 構造になっているので、そのまま読み込めます (marketplace 登録はまだ)。
 
 ### 2. テンプレートをコピー
 
@@ -114,16 +119,17 @@ forge-loop/
 │   ├── boundary-design.md  # AI と人の境界線設計の指針
 │   ├── adapters.md         # 自分の OSS への移植ガイド
 │   └── case-aigis.md       # Aigis 事例集
-├── plugin/                 # Claude Code Plugin
-│   ├── plugin.json
+├── plugin/                 # Claude Code Plugin (公式仕様準拠)
+│   ├── .claude-plugin/
+│   │   └── plugin.json    # メタ情報のみ (name/version/author/...)
 │   ├── skills/
-│   │   ├── forge-research.md
-│   │   ├── forge-plan.md
-│   │   ├── forge-implement.md
-│   │   ├── forge-test.md
-│   │   └── forge-release.md
+│   │   ├── forge-research/SKILL.md
+│   │   ├── forge-plan/SKILL.md
+│   │   ├── forge-implement/SKILL.md
+│   │   ├── forge-test/SKILL.md
+│   │   └── forge-release/SKILL.md
 │   └── agents/
-│       └── forge-orchestrator.md
+│       └── forge-orchestrator/AGENT.md
 ├── template/               # 新規プロジェクト用スターター
 │   ├── auto-improvement/
 │   │   ├── ROTATION.md
