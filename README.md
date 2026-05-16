@@ -69,7 +69,7 @@ claude plugin install forge-loop
 ### 2. テンプレートをコピー
 
 ```bash
-npx degit ueda/forge-loop/template my-project/
+npx degit killertcell428/forge-loop/template my-project/
 cd my-project
 ```
 

@@ -10,7 +10,7 @@
 ここ 1〜2 年、「AI に自動 PR を作らせる」「AI でリリースノートを書かせる」系の事例は増えてきた。
 しかし、**「AI に OSS の継続的な機能追加を全任せして、半自動でリリースし続ける」事例**はまだ少ない。
 
-私は LLM セキュリティスキャナ Aigis でこれを 27 サイクル運用していて、設計から見えてきたことがある。
+私は LLM セキュリティスキャナ Aigis でこれを 17 サイクル運用していて、設計から見えてきたことがある。
 **これは技術問題ではなく、境界線設計の問題**だった、ということ。
 
 この記事では、技術スタック (Claude Code / GitHub Actions) の話ではなく、**「AI と人の責任をどう切り分けるか」**の話を書く。
@@ -164,7 +164,7 @@ Claude Code + GitHub Actions で動かしている。技術スタックは:
 - 状態管理は git でファイルとして
 - リリースは既存 release.yml に乗せる
 
-詳細は [Zenn 本編記事](https://zenn.dev/...) と [forge-loop リポジトリ](https://github.com/...) を参照。
+詳細は [Zenn 本編記事](https://zenn.dev/...) と [forge-loop リポジトリ](https://github.com/killertcell428/forge-loop) を参照。
 
 ---
 
@@ -182,6 +182,6 @@ Claude Code + GitHub Actions で動かしている。技術スタックは:
 
 ## 参考
 
-- [Forge Loop リポジトリ](https://github.com/...) — 設計と参考実装
+- [Forge Loop リポジトリ](https://github.com/killertcell428/forge-loop) — 設計と参考実装
 - [Zenn 本編記事](https://zenn.dev/...) — Aigis での運用記録
 - [Aigis](https://github.com/...) — Forge Loop が動いている実例

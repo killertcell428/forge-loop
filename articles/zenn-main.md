@@ -13,14 +13,14 @@ published: false
 - Claude Code エージェントを **定期起動**して、自分の OSS を **調査 → 実装 → テスト → GitHub リリース** まで自走させる仕組みを作った
 - セキュリティスキャナ [Aigis](https://github.com/...) で **5 日 / 17 サイクル / 11 リリース (v1.0.1 → v1.0.12)** を半自動運用
 - 肝は「AI に何を任せ、人がどこに線を引くか」の設計
-- この設計パターンを **Forge Loop** と名付け、汎用化したものを [GitHub](https://github.com/...) で公開
+- この設計パターンを **Forge Loop** と名付け、汎用化したものを [GitHub](https://github.com/killertcell428/forge-loop) で公開
 
 ---
 
 ## まず Aigis の 1 サイクルを見てもらう
 
 2026 年 5 月 11 日 06:12 UTC、私は寝ている。Aigis の CI で Claude Code エージェントが起動する。
-([実物の研究メモはこちら](https://github.com/.../examples/aigis/snapshot/research/2026-05-11T06-12_6-multi-agent.md))
+([実物の研究メモはこちら](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/research/2026-05-11T06-12_6-multi-agent.md))
 
 ```
 T+0:00   ROTATION.md を読む
@@ -66,7 +66,7 @@ T+34:00  INDEX.md に 1 行追記 → エージェント終了
 | Pending に積まれた提案 | **22 件** (人レビュー待ち) |
 | Release を打たなかった cycle | 6 (累積しきい値未達) |
 
-実データは [examples/aigis/snapshot/](https://github.com/.../examples/aigis/snapshot/) に丸ごと置いてある。
+実データは [examples/aigis/snapshot/](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/) に丸ごと置いてある。
 INDEX.md / ROTATION.md / 全 pending を読めば実運用がそのまま見える。
 
 ---
@@ -168,13 +168,13 @@ auto-improvement/
 - 新規ランタイム依存の追加
 ```
 
-Aigis の `pending/` には現在 **22 件**積まれている (実例は [examples/aigis/snapshot/pending/](https://github.com/.../examples/aigis/snapshot/pending/))。代表例:
+Aigis の `pending/` には現在 **22 件**積まれている (実例は [examples/aigis/snapshot/pending/](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/pending/))。代表例:
 
-- [`crescendo-multiturn-detection`](https://github.com/.../examples/aigis/snapshot/pending/2026-05-08_crescendo-multiturn-detection.md)
+- [`crescendo-multiturn-detection`](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/pending/2026-05-08_crescendo-multiturn-detection.md)
   — 多ターン jailbreak 検出。200 LOC 超 & 公開 API シグネチャ変更が必要
-- [`agent-spoofing-metadata-validation`](https://github.com/.../examples/aigis/snapshot/pending/2026-05-08_agent-spoofing-metadata-validation.md)
+- [`agent-spoofing-metadata-validation`](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/pending/2026-05-08_agent-spoofing-metadata-validation.md)
   — 暗号署名が必要、content scanner では実装不可能
-- [`nist-ai-critical-infra-template`](https://github.com/.../examples/aigis/snapshot/pending/2026-05-09_nist-ai-critical-infra-template.md)
+- [`nist-ai-critical-infra-template`](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/pending/2026-05-09_nist-ai-critical-infra-template.md)
   — 大規模 compliance template、方針判断が必要
 
 これらは **失敗ではなく "意図的な先送り"**。設計通り。
@@ -211,7 +211,7 @@ Forge Loop は Aigis に特化していない。「ドメイン × 段階 × 保
 | **テストカバレッジ拡張** | ファイル群別 |
 | **i18n リソース** | 言語別 |
 
-成果物は [forge-loop リポジトリ](https://github.com/...) に置いた。`template/` をコピーして `domains.yaml` を書き換えれば、3 分で開始できる。
+成果物は [forge-loop リポジトリ](https://github.com/killertcell428/forge-loop) に置いた。`template/` をコピーして `domains.yaml` を書き換えれば、3 分で開始できる。
 
 ---
 
@@ -262,12 +262,12 @@ OSS の継続改修以外にも適用できそうな領域:
 - 監査可能な形で残せば、後から人が修正できる
 - 失敗は隠さず `pending/` で見える化する
 
-Aigis での運用ログと Plugin は [forge-loop リポジトリ](https://github.com/...) で公開しています。実 ROTATION.md / 全 22 pending / サンプル research・changes が `examples/aigis/snapshot/` に丸ごと入っているので、生データを見たい方はそちらをどうぞ。
+Aigis での運用ログと Plugin は [forge-loop リポジトリ](https://github.com/killertcell428/forge-loop) で公開しています。実 ROTATION.md / 全 22 pending / サンプル research・changes が `examples/aigis/snapshot/` に丸ごと入っているので、生データを見たい方はそちらをどうぞ。
 
 ---
 
 ## 参考
 
-- [Forge Loop リポジトリ](https://github.com/...) — 設計と参考実装
+- [Forge Loop リポジトリ](https://github.com/killertcell428/forge-loop) — 設計と参考実装
 - [Aigis (実例の OSS)](https://github.com/...) — Forge Loop が動いている実 OSS
-- [Aigis 実データスナップショット](https://github.com/.../examples/aigis/snapshot/) — 全 17 サイクル + 17 pending
+- [Aigis 実データスナップショット](https://github.com/killertcell428/forge-loop/tree/main/examples/aigis/snapshot/) — 全 17 サイクル + 17 pending
