@@ -1,0 +1,56 @@
+name: Forge Loop Cycle
+
+# Runs the Forge Loop orchestrator on a schedule.
+# Each run = 1 cycle (Research → Plan → Implement → Test → Release).
+#
+# Requirements (set in repository secrets):
+#   - CLAUDE_API_KEY: Anthropic API key
+#   - GITHUB_TOKEN: standard token (provided by Actions)
+#
+# This workflow assumes:
+#   - You have installed the forge-loop plugin
+#   - Your repo has auto-improvement/ROTATION.md, domains.yaml, INDEX.md
+#   - Your release pipeline triggers on tag push (see release.yml)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:         # allow manual trigger
+
+permissions:
+  contents: write            # to commit and tag
+  issues: write              # to file pending notices
+
+concurrency:
+  group: forge-loop
+  cancel-in-progress: false  # never overlap cycles
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # full history needed for proper tagging
+
+      - name: Setup Claude Code
+        run: |
+          # TODO: install Claude Code CLI for headless execution
+          # npm install -g @anthropic-ai/claude-code
+          echo "Setup TBD"
+
+      - name: Run Forge Loop orchestrator
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        run: |
+          # TODO: invoke claude with the forge-orchestrator agent
+          # claude run-agent forge-orchestrator
+          echo "Cycle run TBD"
+
+      - name: Push commits and tags
+        run: |
+          git config user.name "forge-loop[bot]"
+          git config user.email "forge-loop@users.noreply.github.com"
+          git push origin HEAD --follow-tags

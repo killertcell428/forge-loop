@@ -1,0 +1,46 @@
+# Forge Loop Domain Definitions
+#
+# Define the N domains your project should rotate through.
+# Each cycle picks domains[NEXT_INDEX % len(domains)].
+#
+# Guidelines:
+# - 5-15 domains is the sweet spot. <5 means too frequent repetition; >15 means
+#   each domain is touched too rarely.
+# - Domains should be MUTUALLY EXCLUSIVE and roughly equal in scope.
+# - Avoid catch-all "misc" domain — it becomes a dumping ground.
+#
+# Below is a TEMPLATE. Replace with your own domains.
+
+domains:
+  - id: 0
+    name: example-domain-a
+    description: Replace this with a concrete area of your project (e.g., "Python parser improvements")
+    sources:
+      - https://example.com/feed-for-this-domain
+    keywords:
+      - keyword1
+      - keyword2
+
+  - id: 1
+    name: example-domain-b
+    description: ...
+    sources: []
+    keywords: []
+
+  - id: 2
+    name: example-domain-c
+    description: ...
+    sources: []
+    keywords: []
+
+  - id: 3
+    name: example-domain-d
+    description: ...
+    sources: []
+    keywords: []
+
+  - id: 4
+    name: example-domain-e
+    description: ...
+    sources: []
+    keywords: []
