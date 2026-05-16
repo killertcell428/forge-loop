@@ -2,16 +2,16 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Forge Loop OG</title>
+<title>OG</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --bg-2: #161b22;
-    --fg: #c9d1d9;
-    --fg-dim: #8b949e;
-    --accent: #f97316;
-    --accent-2: #ef4444;
-    --line: #30363d;
+    --bg: #0b1020;
+    --bg-2: #131a33;
+    --fg: #e7ecf5;
+    --fg-dim: #95a0bd;
+    --accent: #facc15;
+    --accent-2: #818cf8;
+    --line: #2a3358;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -25,88 +25,95 @@
   }
   body {
     position: relative;
-    padding: 56px 64px;
+    padding: 64px 72px;
   }
-  .bg-grid {
+  /* gradient glow */
+  .glow-1 {
+    position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(250,204,21,0.28), transparent 60%);
+    top: -180px; left: -180px;
+    pointer-events: none;
+  }
+  .glow-2 {
+    position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(129,140,248,0.22), transparent 60%);
+    bottom: -160px; right: -120px;
+    pointer-events: none;
+  }
+  .stars {
     position: absolute; inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 48px 48px;
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 80% 12%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 65% 80%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 22% 88%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 92% 55%, rgba(255,255,255,0.3), transparent);
     pointer-events: none;
   }
-  .glow {
-    position: absolute;
-    width: 480px; height: 480px;
-    background: radial-gradient(circle, rgba(249,115,22,0.35), transparent 60%);
-    top: -120px; right: -120px;
-    pointer-events: none;
-  }
-  .brand {
+  .tag {
     position: relative;
-    display: flex; align-items: center; gap: 12px;
-    font-size: 18px;
-    color: var(--fg-dim);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 14px; color: var(--fg-dim);
+    letter-spacing: 0.04em;
   }
-  .brand-dot {
-    display: inline-block; width: 10px; height: 10px;
-    background: var(--accent); border-radius: 2px;
-    box-shadow: 0 0 16px rgba(249,115,22,0.7);
-  }
+  .tag .moon { font-size: 18px; }
   .title {
     position: relative;
-    font-size: 64px;
-    font-weight: 800;
-    line-height: 1.12;
     margin-top: 28px;
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1.18;
     letter-spacing: -0.01em;
+    max-width: 1000px;
   }
   .title .em { color: var(--accent); }
-  .subtitle {
-    position: relative;
-    margin-top: 24px;
-    font-size: 24px;
-    line-height: 1.45;
-    color: var(--fg-dim);
-    max-width: 880px;
-  }
-  .pills {
+  .title .em2 { color: var(--accent-2); }
+  .stat-row {
     position: absolute;
-    bottom: 56px; left: 64px; right: 64px;
-    display: flex; gap: 16px; flex-wrap: wrap;
+    left: 72px; right: 72px; bottom: 64px;
+    display: flex; gap: 12px;
   }
-  .pill {
-    padding: 10px 18px;
-    background: var(--bg-2);
+  .stat {
+    flex: 1;
+    padding: 16px 18px;
+    background: rgba(255,255,255,0.04);
     border: 1px solid var(--line);
-    border-radius: 8px;
-    font-size: 17px;
-    color: var(--fg);
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
   }
-  .pill b { color: var(--accent); }
-  .pill .label { color: var(--fg-dim); font-size: 13px; display: block; letter-spacing: 0.05em; }
-  .pill .value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  .stat .num {
+    font-size: 32px; font-weight: 800; letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+  .stat .label {
+    margin-top: 4px;
+    font-size: 13px; color: var(--fg-dim);
+    letter-spacing: 0.04em;
+  }
+  .stat.alt .num { color: var(--accent-2); }
 </style>
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="glow"></div>
-  <div class="brand"><span class="brand-dot"></span>FORGE LOOP</div>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+  <div class="stars"></div>
+
+  <div class="tag"><span class="moon">💤</span> Claude Code × 個人 OSS の継続改善</div>
   <div class="title">
-    Claude Code に OSS の<br>
-    <span class="em">継続改善を全任せ</span>する設計パターン
+    自分の OSS を <span class="em2">Claude Code</span> に任せたら、<br>
+    <span class="em">寝ている間に 11 回リリース</span><br>されていた
   </div>
-  <div class="subtitle">
-    AI に「自由」を与えると暴走し、「脚本」を渡すと無価値になる。<br>
-    外枠を人が決め、中身を AI に任せる — それが Forge Loop。
-  </div>
-  <div class="pills">
-    <div class="pill"><div class="label">CYCLES</div><div class="value">17</div></div>
-    <div class="pill"><div class="label">RELEASES</div><div class="value">11</div></div>
-    <div class="pill"><div class="label">PENDING</div><div class="value">22</div></div>
-    <div class="pill"><div class="label">PERIOD</div><div class="value">5 days</div></div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="num">5 日</div><div class="label">PERIOD</div></div>
+    <div class="stat"><div class="num">17 回</div><div class="label">CYCLES</div></div>
+    <div class="stat"><div class="num">11 回</div><div class="label">RELEASES</div></div>
+    <div class="stat alt"><div class="num">22 件</div><div class="label">DEFERRED</div></div>
   </div>
 </body>
 </html>
