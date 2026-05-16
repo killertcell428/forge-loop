@@ -1,48 +1,73 @@
 ---
-title: "Claude Code に OSS の継続改善を全任せする — Forge Loop 設計と Aigis 27 サイクル運用記"
+title: "Claude Code に OSS の継続改善を全任せする — Forge Loop 設計と Aigis 17 サイクル運用記"
 emoji: "🔥"
 type: "tech"
 topics: ["claude", "claudecode", "ai", "oss", "agent"]
 published: false
 ---
 
+![Forge Loop overview](/images/forge-loop/og.png)
+
 ## TL;DR
 
-- Claude Code エージェントを **6 時間おき**に起動して、自分の OSS を **調査 → 実装 → テスト → GitHub リリース** まで自走させる仕組みを作った
-- セキュリティスキャナ [Aigis](https://github.com/...) で **27 サイクル / 137 検出ルール / v1.0.7 → v1.0.17** まで半自動で到達
+- Claude Code エージェントを **定期起動**して、自分の OSS を **調査 → 実装 → テスト → GitHub リリース** まで自走させる仕組みを作った
+- セキュリティスキャナ [Aigis](https://github.com/...) で **5 日 / 17 サイクル / 11 リリース (v1.0.1 → v1.0.12)** を半自動運用
 - 肝は「AI に何を任せ、人がどこに線を引くか」の設計
-- この設計パターンを **Forge Loop** と名付け、汎用化したものを公開する
+- この設計パターンを **Forge Loop** と名付け、汎用化したものを [GitHub](https://github.com/...) で公開
 
 ---
 
 ## まず Aigis の 1 サイクルを見てもらう
 
-2026 年 5 月 13 日 03:00 UTC、私は寝ている。Aigis のサーバーで cron が動き、Claude Code エージェントが起動する。
+2026 年 5 月 11 日 06:12 UTC、私は寝ている。Aigis の CI で Claude Code エージェントが起動する。
+([実物の研究メモはこちら](https://github.com/.../examples/aigis/snapshot/research/2026-05-11T06-12_6-multi-agent.md))
 
 ```
-03:00:00  cron → Claude Code 起動
-03:00:05  ROTATION.md を読む
-            NEXT_INDEX: 6 → 今回のドメインは "supply-chain-attacks"
-03:00:30  research/2026-05-13T03-00_06-supply-chain.md を新規作成
-            arxiv / GitHub Advisories / CVE を漁る
-            「LangChain CVE-2025-68664 が新しい」
-            「PyTorch 2.5.x に任意コード実行」
-            「Hydra config injection」
-03:15:00  changes/2026-05-13T03-00.md に実装案を記録
-03:20:00  aigis/patterns.py に regex を 3 件追加 (40〜50 LOC)
-03:25:00  tests/test_supply_chain.py にテスト 4 件追加
-03:30:00  pytest 実行 → 全部通る
-03:35:00  4 件目のアイデアは 200 LOC 超 & API breaking
-            → pending/2026-05-13_dependency-scanner.md に隔離 (実装しない)
-03:40:00  累積ルール ≥3 件 → CHANGELOG 追記 + git tag v1.0.13
-03:45:00  GitHub Actions が tag 検知 → PyPI 自動公開
-03:45:30  INDEX.md に 1 行追記
-03:45:31  エージェント終了
+T+0:00   ROTATION.md を読む
+           NEXT_INDEX: 6 → 今回のドメインは "multi-agent"
+
+T+0:30   research/2026-05-11T06-12_6-multi-agent.md を新規作成
+           arxiv / Unit42 / Keysight / LevelBlue から A2A protocol 攻撃を調査
+           → Agent Session Smuggling (Unit42, April 2025)
+           → Agent Card Poisoning (Keysight + LevelBlue, March 2026)
+           → Promptware Kill Chain (arxiv:2601.09625)
+           → MASpi benchmark, など 7 件の調査ソース
+
+T+15:00  changes/2026-05-11T06-12_changes.md に実装案を記録
+
+T+20:00  aigis/multi_agent/message_scanner.py に regex を 2 グループ追加
+           _AGENT_CARD_POISONING_PATTERNS (3 rules, 19 LOC)
+           _SESSION_FABRICATION_PATTERNS  (3 rules, 21 LOC)
+
+T+25:00  tests/test_multi_agent.py に 8 ケース追加
+           pytest → 1222 pass · 16 pre-existing failures · 4 skipped
+
+T+27:00  3 つ目のアイデア (Agent spoofing 検出) は metadata-layer の検証必須
+         → content scanner では実装不可能
+         → pending/2026-05-08_agent-spoofing-metadata-validation.md に隔離
+
+T+30:00  累積ルール 5 件 (前回 supply-chain 3 + 今回 multi-agent 2)
+         → ≥3 件 threshold クリア → v1.0.12 patch bump
+
+T+32:00  CHANGELOG 追記 + git tag v1.0.12
+T+33:00  GitHub Actions が tag を検知 → PyPI 自動公開
+T+34:00  INDEX.md に 1 行追記 → エージェント終了
 ```
 
 朝起きてリリースノートを眺めると、**自分が一切タッチしていないバージョンが PyPI に上がっている**。
 
-これを **6 時間ごとに 27 回**繰り返した結果が、現在の Aigis 137 検出ルール。
+5 日間でこれを 17 回繰り返した結果が、現在の Aigis の状態:
+
+| 指標 | 値 |
+|---|---|
+| 累積サイクル数 | **17** |
+| 累積 Pending | **22 件** |
+| リリース回数 | **11** (v1.0.1 → v1.0.12, v1.0.5 はスキップ) |
+| Pending に積まれた提案 | **22 件** (人レビュー待ち) |
+| Release を打たなかった cycle | 6 (累積しきい値未達) |
+
+実データは [examples/aigis/snapshot/](https://github.com/.../examples/aigis/snapshot/) に丸ごと置いてある。
+INDEX.md / ROTATION.md / 全 pending を読めば実運用がそのまま見える。
 
 ---
 
@@ -52,7 +77,7 @@ published: false
 
 | 失敗モード | 何が起きるか |
 |---|---|
-| **題材偏り** | 毎回プロンプトインジェクションばかり触る（流行 / 楽な題材に流れる） |
+| **題材偏り** | 毎回プロンプトインジェクションばかり触る (流行 / 楽な題材に流れる) |
 | **思考の蒸発** | 「考えました」だけで何も残らない、後から監査できない |
 | **暴走 PR** | 「API 全部書き換えます」と巨大 PR を出してリポジトリが壊れる |
 | **無限ループ** | どこで止めればいいか分からず、同じ修正を延々繰り返す |
@@ -64,6 +89,8 @@ published: false
 ---
 
 ## 主役の主張
+
+![Boundary design](/images/forge-loop/boundary.png)
 
 **外枠を人が決め、中身を AI に任せる。**
 
@@ -83,28 +110,29 @@ published: false
 ドメイン一覧を `domains.yaml` のような形で **人が手で書く**。実行時は `ROTATION.md` の `NEXT_INDEX` を mod N で進めるだけ。
 
 ```markdown
-# ROTATION.md
-NEXT_INDEX: 6
-LAST_RUN_UTC: 2026-05-13T03:00:00
-```
+# auto-improvement/ROTATION.md
 
-```yaml
-# domains.yaml (Aigis の例)
-domains:
-  - id: 0
-    name: prompt-injection
-  - id: 1
-    name: agent-tool-abuse
-  - id: 2
-    name: data-exfiltration
-  # ...
-  - id: 9
-    name: incident-postmortems
+NEXT_INDEX: 7
+LAST_RUN_UTC: 2026-05-11T06-12
+
+## 領域定義
+| # | キー | 主たる調査対象 |
+|---|------|--------------|
+| 0 | prompt-injection | 直接 / 間接 / multi-modal 注入 |
+| 1 | agent-tool-abuse | tool / MCP 濫用、confused deputy |
+| 2 | data-exfiltration | データ漏洩、出力チャネル悪用 |
+| 3 | jailbreak-extraction | jailbreak、system prompt 抽出 |
+| 4 | memory-context | メモリ汚染、RAG poisoning |
+| 5 | supply-chain-llm | model / dataset / dep 攻撃 |
+| 6 | multi-agent | A2A protocol、agent card poisoning |
+| 7 | evasion-obfuscation | encoding、homoglyph、policy bypass |
+| 8 | compliance-regulation | NIST、EU AI Act 等の更新 |
+| 9 | incident-postmortems | CVE、ベンダーアドバイザリ |
 ```
 
 エージェントの初動は必ず **「ROTATION.md を読む」**から始まる。今日何をやるかの選択権は AI にない。
 
-これが効くのは、**メタ判断（何をやるか）こそ AI が最も暴走しやすい場所**だから。中身の判断は安定するが、メタ判断は流行や直前の文脈に簡単に引きずられる。
+これが効くのは、**メタ判断 (何をやるか) こそ AI が最も暴走しやすい場所**だから。中身の判断は安定するが、メタ判断は流行や直前の文脈に簡単に引きずられる。
 
 ### ② Materialize (物質化) — AI の思考を必ずファイルに落とす
 
@@ -113,11 +141,11 @@ domains:
 ```
 auto-improvement/
 ├── research/                                 # 段階1: 調査
-│   └── 2026-05-13T03-00_06-supply-chain.md
-├── changes/                                  # 段階2: 実装案
-│   └── 2026-05-13T03-00.md
+│   └── 2026-05-11T06-12_6-multi-agent.md
+├── changes/                                  # 段階2: 実装案 + 結果
+│   └── 2026-05-11T06-12_changes.md
 ├── pending/                                  # 段階3: 保留
-│   └── 2026-05-13_dependency-scanner.md
+│   └── 2026-05-08_agent-spoofing-metadata-validation.md
 └── INDEX.md                                  # 全実行の追記式ログ
 ```
 
@@ -125,7 +153,7 @@ auto-improvement/
 
 実装フェーズで「research/ を読み込んで、changes/ に書き、コードを変更し、tests/ にテストを追加する」を **規約**にしておくと、AI はこの流れから外れられない。外れたら後から見て一目で分かるので、是正できる。
 
-長期間 AI に任せるとき、これがないと「2 週間前に何があったか」が霧消する。**監査可能性こそが「任せる」を成立させる**。
+長期間 AI に任せるとき、これがないと「先週何があったか」が霧消する。**監査可能性こそが「任せる」を成立させる**。
 
 ### ③ Defer (保留) — 完了 / 失敗の二択にしない
 
@@ -134,29 +162,24 @@ auto-improvement/
 ```markdown
 # Pending 行きの判定基準
 - 100 LOC を超える変更
-- API breaking change
+- API breaking change (公開関数のシグネチャ変更等)
 - 既存テストを書き換える必要がある
 - セキュリティ的に確信度が低い
+- 新規ランタイム依存の追加
 ```
 
-Aigis の `pending/` には現在 **9 件積まれていて、人が触るまで眠っている**。これは失敗ではなく、設計通り。
+Aigis の `pending/` には現在 **22 件**積まれている (実例は [examples/aigis/snapshot/pending/](https://github.com/.../examples/aigis/snapshot/pending/))。代表例:
+
+- [`crescendo-multiturn-detection`](https://github.com/.../examples/aigis/snapshot/pending/2026-05-08_crescendo-multiturn-detection.md)
+  — 多ターン jailbreak 検出。200 LOC 超 & 公開 API シグネチャ変更が必要
+- [`agent-spoofing-metadata-validation`](https://github.com/.../examples/aigis/snapshot/pending/2026-05-08_agent-spoofing-metadata-validation.md)
+  — 暗号署名が必要、content scanner では実装不可能
+- [`nist-ai-critical-infra-template`](https://github.com/.../examples/aigis/snapshot/pending/2026-05-09_nist-ai-critical-infra-template.md)
+  — 大規模 compliance template、方針判断が必要
+
+これらは **失敗ではなく "意図的な先送り"**。設計通り。
 
 「やらない判断」を AI に許すと、AI は「危なそうなものは pending」と書いて次に進む。許さないと、AI は **「とにかく実装する」**に倒れる。これが暴走の主犯。
-
----
-
-## 累積実績 (Aigis での 5 ヶ月)
-
-| 指標 | 数 |
-|---|---|
-| 実行サイクル | 27 |
-| リリースバージョン | v1.0.7 → v1.0.17 (11 リリース) |
-| 追加検出ルール | 137 |
-| pending に積まれた提案 | 9 |
-| 完全自動 (人が読まなかった) リリース | 約 60% |
-| 人がレビューして修正したリリース | 約 40% |
-
-「半自動」と書いているのは、リリース直後に PyPI 経由で広がってしまうので、**怪しい時だけは止める判断を人がしている**ため。実装そのものは AI が完結している。
 
 ---
 
@@ -168,7 +191,7 @@ Aigis の `pending/` には現在 **9 件積まれていて、人が触るまで
 |---|---|
 | AI が PR をレビューする | AI が PR を作って merge して release する |
 | AI がドキュメント生成 | AI が機能を増やしてリリースする |
-| 単発タスク (1 回限り) | 6 時間おきに 27 回続く |
+| 単発タスク (1 回限り) | 数時間おきに 17 回続いた |
 | 多エージェント実験 | シングルエージェント本番運用 |
 | 「やってみた」記事 | 半自動でリリースし続けている事実 |
 
@@ -194,25 +217,26 @@ Forge Loop は Aigis に特化していない。「ドメイン × 段階 × 保
 
 ## 失敗事例 (この記事の "もう一つの主役")
 
-きれい事を書いたが、実際は何回か事故っている:
+きれい事を書いたが、実際は何回か事故っている。
 
-### 事故1: 同じドメインを 5 回連続でやった
+### 事故 1: pending 判定をプロンプトに任せて 110 LOC が暴走
 
-ROTATION.md の `NEXT_INDEX` を mod N にする実装を忘れていて、`NEXT_INDEX` がずっと 0 だった。AI は「今回はドメイン 0 ですね」と毎回真面目に同じドメインを処理。気づくのに 30 時間かかった。
+最初は `defer_thresholds.max_loc_per_change = 100` を **プロンプトに書いていただけ**だった。
+ある cycle で AI が「110 LOC ですが本質的には 1 つの変更です」と判断して実装し、テストが通ったので tag が打たれた。
 
-→ **学び: 巡回ロジックは AI ではなく決定論的なコードで管理する。**
+→ **学び**: 判定はプロンプトではなく LOC カウントなど機械的指標で実施。
 
-### 事故2: pending/ が機能せず、200 LOC の PR が勝手にマージされた
+### 事故 2: research/ が空のまま implement に直行
 
-pending 行きの判定を AI のプロンプトに書いていただけで、強制力がなかった。AI は「今回はやれそう」と判断して実装し、テストが通ったので tag が打たれた。
+外部 API が落ちていて research が空ファイルになった cycle。AI は「知識ベースから」と称して既存知識で 3 件実装した。事故ではないが、**研究知見のないルールが生産された**のは問題。
 
-→ **学び: 判定はプロンプトではなく LOC カウントなど機械的指標で実施。**
+→ **学び**: 各段階の成果物存在を次段階の開始条件にする (research/<date>.md に最低 1 つの URL が無いと changes/ に書けない)。
 
-### 事故3: research/ が空のまま実装に進んだ
+### 事故 3: regex の初版が現実と合っていない
 
-調査段階をスキップして、AI が「知っている範囲で」実装した。事故ではないが、**研究知見のないルールが大量生産された**。
+Cycle 6 で agent card poisoning の regex が `route\s+to` を要求していたが、実際の攻撃文は "route requests to" (動詞と目的語の間に語が入る)。
 
-→ **学び: 各段階の成果物存在を次段階の開始条件にする (research/<date>.md が無いと changes/ に書けない、など)。**
+→ **学び**: cycle 内でのテスト失敗→修正が回せている。これは Materialize の効能 (changes/*.md に修正過程が記録される)。
 
 ---
 
@@ -224,6 +248,7 @@ OSS の継続改修以外にも適用できそうな領域:
 - **データセット品質の継続改善** (ドメイン = カテゴリ)
 - **ブログサイトの自動運営** (ドメイン = テーマ)
 - **マーケティングコンテンツ生成** (ドメイン = プロダクト機能)
+- **Q&A bot のナレッジ拡張** (ドメイン = カテゴリ / 製品)
 
 共通するのは **「ドメインが N 個あり、それぞれを継続的に育てたい」**シチュエーション。
 
@@ -237,12 +262,12 @@ OSS の継続改修以外にも適用できそうな領域:
 - 監査可能な形で残せば、後から人が修正できる
 - 失敗は隠さず `pending/` で見える化する
 
-Aigis での運用ログと Plugin は [forge-loop リポジトリ](https://github.com/...) で公開しています。
+Aigis での運用ログと Plugin は [forge-loop リポジトリ](https://github.com/...) で公開しています。実 ROTATION.md / 全 22 pending / サンプル research・changes が `examples/aigis/snapshot/` に丸ごと入っているので、生データを見たい方はそちらをどうぞ。
 
 ---
 
 ## 参考
 
-- [Forge Loop リポジトリ](https://github.com/...)
-- [Aigis (実例の OSS)](https://github.com/...)
-- [Claude Code Plugin ドキュメント](https://docs.claude.com/...)
+- [Forge Loop リポジトリ](https://github.com/...) — 設計と参考実装
+- [Aigis (実例の OSS)](https://github.com/...) — Forge Loop が動いている実 OSS
+- [Aigis 実データスナップショット](https://github.com/.../examples/aigis/snapshot/) — 全 17 サイクル + 17 pending

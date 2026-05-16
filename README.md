@@ -14,7 +14,7 @@ AI に「OSS を良くしておいて」と丸投げすると、暴走する。
 
 **Forge Loop は「外枠を人が決め、中身を AI に任せる」設計パターン**。
 
-実例: [Aigis](https://github.com/...) (LLM セキュリティスキャナ) で **27 サイクル / 137 検出ルール / v1.0.7 → v1.0.17 を半自動運用中**。
+実例: [Aigis](https://github.com/...) (LLM セキュリティスキャナ) で **5 日 / 17 サイクル / 11 リリース (v1.0.1 → v1.0.12) を半自動運用**。実データは [`examples/aigis/snapshot/`](./examples/aigis/snapshot/) に丸ごと公開。
 
 ---
 

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Forge Loop OG</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-2: #161b22;
+    --fg: #c9d1d9;
+    --fg-dim: #8b949e;
+    --accent: #f97316;
+    --accent-2: #ef4444;
+    --line: #30363d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    position: relative;
+    padding: 56px 64px;
+  }
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+  .glow {
+    position: absolute;
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(249,115,22,0.35), transparent 60%);
+    top: -120px; right: -120px;
+    pointer-events: none;
+  }
+  .brand {
+    position: relative;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 18px;
+    color: var(--fg-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .brand-dot {
+    display: inline-block; width: 10px; height: 10px;
+    background: var(--accent); border-radius: 2px;
+    box-shadow: 0 0 16px rgba(249,115,22,0.7);
+  }
+  .title {
+    position: relative;
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.12;
+    margin-top: 28px;
+    letter-spacing: -0.01em;
+  }
+  .title .em { color: var(--accent); }
+  .subtitle {
+    position: relative;
+    margin-top: 24px;
+    font-size: 24px;
+    line-height: 1.45;
+    color: var(--fg-dim);
+    max-width: 880px;
+  }
+  .pills {
+    position: absolute;
+    bottom: 56px; left: 64px; right: 64px;
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .pill {
+    padding: 10px 18px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 17px;
+    color: var(--fg);
+  }
+  .pill b { color: var(--accent); }
+  .pill .label { color: var(--fg-dim); font-size: 13px; display: block; letter-spacing: 0.05em; }
+  .pill .value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow"></div>
+  <div class="brand"><span class="brand-dot"></span>FORGE LOOP</div>
+  <div class="title">
+    Claude Code に OSS の<br>
+    <span class="em">継続改善を全任せ</span>する設計パターン
+  </div>
+  <div class="subtitle">
+    AI に「自由」を与えると暴走し、「脚本」を渡すと無価値になる。<br>
+    外枠を人が決め、中身を AI に任せる — それが Forge Loop。
+  </div>
+  <div class="pills">
+    <div class="pill"><div class="label">CYCLES</div><div class="value">17</div></div>
+    <div class="pill"><div class="label">RELEASES</div><div class="value">11</div></div>
+    <div class="pill"><div class="label">PENDING</div><div class="value">22</div></div>
+    <div class="pill"><div class="label">PERIOD</div><div class="value">5 days</div></div>
+  </div>
+</body>
+</html>

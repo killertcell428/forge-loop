@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Boundary Design</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-2: #f6f8fa;
+    --fg: #1f2328;
+    --fg-dim: #656d76;
+    --human: #0969da;
+    --human-soft: #ddf4ff;
+    --ai: #f97316;
+    --ai-soft: #fef3e2;
+    --line: #d0d7de;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1200px;
+    height: 800px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding: 48px 56px; }
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; }
+  .sub { color: var(--fg-dim); font-size: 15px; margin-top: 4px; }
+
+  .tagline {
+    margin-top: 24px;
+    padding: 16px 20px;
+    background: linear-gradient(90deg, var(--human-soft) 0%, var(--ai-soft) 100%);
+    border-left: 4px solid var(--ai);
+    border-radius: 6px;
+    font-size: 18px; line-height: 1.5; font-weight: 600;
+  }
+  .tagline .em-h { color: var(--human); }
+  .tagline .em-a { color: var(--ai); }
+
+  .matrix {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .matrix > div { padding: 16px 18px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .matrix > div:first-child,
+  .matrix > div:nth-child(2),
+  .matrix > div:nth-child(3) { border-top: none; }
+  .matrix > div:nth-child(3n+1) { border-left: none; }
+
+  .h-axis { background: var(--bg-2); font-size: 13px; color: var(--fg-dim); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .h-human { background: var(--human-soft); color: var(--human); font-size: 16px; font-weight: 700; }
+  .h-ai { background: var(--ai-soft); color: var(--ai); font-size: 16px; font-weight: 700; }
+  .h-human::before { content: '👤 '; }
+  .h-ai::before { content: '🤖 '; }
+
+  .row-label { background: var(--bg-2); }
+  .row-label .name { font-size: 16px; font-weight: 700; }
+  .row-label .desc { font-size: 12px; color: var(--fg-dim); margin-top: 4px; line-height: 1.5; }
+
+  .cell { font-size: 14px; line-height: 1.6; }
+  .cell .bullet { display: block; padding: 4px 0; }
+  .cell .bullet::before { content: '・'; color: var(--fg-dim); margin-right: 2px; }
+
+  .summary {
+    margin-top: 28px;
+    padding: 18px 24px;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px;
+    display: flex; gap: 32px; align-items: center;
+  }
+  .summary .label { font-size: 13px; color: var(--fg-dim); letter-spacing: 0.08em; }
+  .summary .text { flex: 1; font-size: 15px; line-height: 1.5; }
+  .summary .text b { color: var(--ai); }
+</style>
+</head>
+<body>
+  <h1>境界線設計 — AI と人の責任分界</h1>
+  <div class="sub">Forge Loop の真の主張 = 「外枠は人が決め、中身は AI に任せる」</div>
+
+  <div class="tagline">
+    <span class="em-h">外枠</span>を <span class="em-h">人</span> が決め、
+    <span class="em-a">中身</span>を <span class="em-a">AI</span> に任せる。
+  </div>
+
+  <div class="matrix">
+    <div class="h-axis">境界線の 3 軸</div>
+    <div class="h-human">人 が引く線 (外枠)</div>
+    <div class="h-ai">AI が決める (中身)</div>
+
+    <div class="row-label">
+      <div class="name">① WHAT</div>
+      <div class="desc">今日 何をやるか</div>
+    </div>
+    <div class="cell">
+      <span class="bullet">ドメイン一覧 (domains.yaml)</span>
+      <span class="bullet">ドメイン巡回ロジック (mod N)</span>
+      <span class="bullet">巡回順序の固定</span>
+    </div>
+    <div class="cell">
+      <span class="bullet">該当ドメイン内で何を調べるか</span>
+      <span class="bullet">どの一次ソースを引くか</span>
+      <span class="bullet">どの Finding を採用するか</span>
+    </div>
+
+    <div class="row-label">
+      <div class="name">② HOW</div>
+      <div class="desc">どう残すか</div>
+    </div>
+    <div class="cell">
+      <span class="bullet">各段階の出力ファイル名規約</span>
+      <span class="bullet">ディレクトリ構造 (research/changes/pending)</span>
+      <span class="bullet">追記式の強制</span>
+    </div>
+    <div class="cell">
+      <span class="bullet">各ファイルの中身</span>
+      <span class="bullet">記述の粒度・優先順</span>
+      <span class="bullet">補足情報の選別</span>
+    </div>
+
+    <div class="row-label">
+      <div class="name">③ STOP</div>
+      <div class="desc">どこで止めるか</div>
+    </div>
+    <div class="cell">
+      <span class="bullet">Pending 閾値 (LOC, API breaking)</span>
+      <span class="bullet">Release 閾値 (累積 ≥3 件)</span>
+      <span class="bullet">閾値の値そのもの</span>
+    </div>
+    <div class="cell">
+      <span class="bullet">閾値に当たるかの機械的判定</span>
+      <span class="bullet">Pending に書く理由</span>
+      <span class="bullet">代替案の提示</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="label">RULE OF THUMB</div>
+    <div class="text">
+      <b>メタ判断 / 形式 / やめる判断</b> は人が握る。
+      <b>中身を作る判断</b>だけ AI に任せる。AI は文脈窓を超えた一貫性が弱いので、
+      長期一貫性が必要なものは決定論で固定する。
+    </div>
+  </div>
+</body>
+</html>

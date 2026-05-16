@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Forge Loop - Loop Diagram</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-2: #f6f8fa;
+    --fg: #1f2328;
+    --fg-dim: #656d76;
+    --accent: #f97316;
+    --accent-soft: #fed7aa;
+    --green: #1f883d;
+    --red: #cf222e;
+    --line: #d0d7de;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1200px;
+    height: 800px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding: 48px 56px; }
+  h1 {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .sub { color: var(--fg-dim); font-size: 15px; margin-bottom: 28px; }
+  .canvas { position: relative; height: 660px; }
+  .trigger {
+    position: absolute; left: 0; top: 8px;
+    width: 180px; padding: 14px 16px;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px;
+  }
+  .trigger .label { font-size: 11px; color: var(--fg-dim); letter-spacing: 0.1em; }
+  .trigger .name { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .trigger .desc { font-size: 12px; color: var(--fg-dim); margin-top: 4px; }
+  .arrow-down {
+    position: absolute; left: 90px; top: 90px; width: 2px; height: 40px;
+    background: var(--line);
+  }
+  .arrow-down::after {
+    content: ''; position: absolute; bottom: -1px; left: -4px;
+    border: 5px solid transparent; border-top-color: var(--line);
+  }
+  .orchestrator {
+    position: absolute; left: 0; top: 144px;
+    width: 180px; padding: 14px 16px;
+    background: #fef3e2; border: 2px solid var(--accent); border-radius: 10px;
+  }
+  .orchestrator .label { font-size: 11px; color: var(--accent); letter-spacing: 0.1em; font-weight: 700; }
+  .orchestrator .name { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .orchestrator .desc { font-size: 12px; color: var(--fg-dim); margin-top: 4px; }
+  .stages {
+    position: absolute; left: 260px; top: 144px;
+    display: flex; gap: 14px;
+  }
+  .stage {
+    width: 160px; padding: 14px 14px;
+    background: white; border: 1px solid var(--line); border-radius: 10px;
+    position: relative;
+  }
+  .stage .num {
+    position: absolute; top: -10px; left: 12px;
+    width: 22px; height: 22px;
+    background: var(--accent); color: white;
+    font-size: 12px; font-weight: 700;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stage .name { font-size: 15px; font-weight: 700; margin-top: 6px; }
+  .stage .artifact {
+    font-size: 11px; color: var(--fg-dim); margin-top: 8px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: var(--bg-2); padding: 4px 6px; border-radius: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .between {
+    position: absolute; top: 174px; width: 14px; height: 2px;
+    background: var(--line);
+  }
+  .between::after {
+    content: ''; position: absolute; right: -1px; top: -4px;
+    border: 5px solid transparent; border-left-color: var(--line);
+  }
+  .b1 { left: 244px; } .b2 { left: 418px; } .b3 { left: 592px; } .b4 { left: 766px; } .b5 { left: 940px; }
+
+  .branch-pending {
+    position: absolute; left: 418px; top: 280px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .branch-pending::before {
+    content: ''; position: absolute; left: 70px; top: -80px;
+    width: 2px; height: 70px; background: var(--red);
+    border-left: 2px dashed var(--red);
+    background: none;
+  }
+  .pending-box {
+    width: 380px; padding: 14px 16px;
+    background: #fff0ee; border: 2px dashed var(--red); border-radius: 10px;
+  }
+  .pending-box .label { font-size: 11px; color: var(--red); letter-spacing: 0.1em; font-weight: 700; }
+  .pending-box .name { font-size: 15px; font-weight: 700; margin-top: 4px; }
+  .pending-box .desc { font-size: 12px; color: var(--fg-dim); margin-top: 6px; line-height: 1.5; }
+
+  .branch-release {
+    position: absolute; right: 0; top: 280px;
+    width: 260px;
+  }
+  .release-box {
+    padding: 14px 16px;
+    background: #ddf4e4; border: 2px solid var(--green); border-radius: 10px;
+  }
+  .release-box .label { font-size: 11px; color: var(--green); letter-spacing: 0.1em; font-weight: 700; }
+  .release-box .name { font-size: 15px; font-weight: 700; margin-top: 4px; }
+  .release-box .desc { font-size: 12px; color: var(--fg-dim); margin-top: 6px; line-height: 1.5; }
+
+  .state-section {
+    position: absolute; top: 410px; left: 0; right: 0;
+    padding: 20px 24px;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .state-section h3 { font-size: 13px; color: var(--fg-dim); letter-spacing: 0.08em; margin-bottom: 12px; }
+  .state-row { display: flex; gap: 14px; }
+  .state-file {
+    flex: 1; padding: 12px;
+    background: white; border: 1px solid var(--line); border-radius: 8px;
+  }
+  .state-file .fn {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px; font-weight: 700; color: var(--accent);
+  }
+  .state-file .role { font-size: 12px; color: var(--fg-dim); margin-top: 4px; line-height: 1.5; }
+
+  .legend {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; gap: 24px; font-size: 12px; color: var(--fg-dim);
+  }
+  .lg-item { display: flex; align-items: center; gap: 6px; }
+  .lg-dot { width: 12px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+  <h1>Forge Loop — 1 cycle anatomy</h1>
+  <div class="sub">外枠 (人) と 中身 (AI) の境界線、5 段階のステージ、3 つの出口</div>
+
+  <div class="canvas">
+    <div class="trigger">
+      <div class="label">TRIGGER</div>
+      <div class="name">cron / scheduled</div>
+      <div class="desc">6h ごとに起動</div>
+    </div>
+    <div class="arrow-down"></div>
+    <div class="orchestrator">
+      <div class="label">AGENT</div>
+      <div class="name">forge-orchestrator</div>
+      <div class="desc">1 cycle 完結</div>
+    </div>
+
+    <div class="stages">
+      <div class="stage"><div class="num">1</div><div class="name">Research</div><div class="artifact">research/&lt;id&gt;.md</div></div>
+      <div class="stage"><div class="num">2</div><div class="name">Plan</div><div class="artifact">changes/&lt;utc&gt;.md</div></div>
+      <div class="stage"><div class="num">3</div><div class="name">Implement</div><div class="artifact">&lt;source files&gt;</div></div>
+      <div class="stage"><div class="num">4</div><div class="name">Test</div><div class="artifact">tests/ + pytest</div></div>
+      <div class="stage"><div class="num">5</div><div class="name">Release</div><div class="artifact">CHANGELOG + tag</div></div>
+    </div>
+    <div class="between b2"></div>
+    <div class="between b3"></div>
+    <div class="between b4"></div>
+    <div class="between b5"></div>
+
+    <div class="branch-pending">
+      <div class="pending-box">
+        <div class="label">DEFER LANE (3rd exit)</div>
+        <div class="name">pending/&lt;date&gt;_&lt;name&gt;.md</div>
+        <div class="desc">≥100 LOC / API breaking / 確信度低 → 実装せず隔離。人レビュー待ちで眠る。</div>
+      </div>
+    </div>
+
+    <div class="branch-release">
+      <div class="release-box">
+        <div class="label">ACCUMULATING RELEASE</div>
+        <div class="name">git tag + GitHub Actions</div>
+        <div class="desc">累積 ≥3 件で patch bump、tag → PyPI 自動公開。未満なら CHANGELOG[Unreleased] に追記のみ。</div>
+      </div>
+    </div>
+
+    <div class="state-section">
+      <h3>STATE LAYER — auto-improvement/ 配下</h3>
+      <div class="state-row">
+        <div class="state-file">
+          <div class="fn">ROTATION.md</div>
+          <div class="role">NEXT_INDEX を mod N で更新。次回のドメインを決定論的に固定。</div>
+        </div>
+        <div class="state-file">
+          <div class="fn">domains.yaml</div>
+          <div class="role">N 個のドメイン定義。人が編集する唯一の入口。</div>
+        </div>
+        <div class="state-file">
+          <div class="fn">INDEX.md</div>
+          <div class="role">全 cycle の追記式ログ。失敗 cycle も残す。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="lg-item"><span class="lg-dot" style="background:#f97316;"></span>AI が動く場所</div>
+      <div class="lg-item"><span class="lg-dot" style="background:#1f883d;"></span>機械的判定で完了</div>
+      <div class="lg-item"><span class="lg-dot" style="background:#cf222e;"></span>人レビューに退避</div>
+    </div>
+  </div>
+</body>
+</html>

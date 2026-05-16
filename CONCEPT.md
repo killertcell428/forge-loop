@@ -7,7 +7,7 @@
 
 ## 1行で
 
-**Claude Code に、OSS の継続改善を「数時間おきに 調査 → 実装 → GitHub リリース」まで全任せできるループを作った。鍵は AI と人の境界線をどう引くか。** Aigis で 27 サイクル / 137 ルール / v1.0.7 → v1.0.17 まで運用中。
+**Claude Code に、OSS の継続改善を「数時間おきに 調査 → 実装 → GitHub リリース」まで全任せできるループを作った。鍵は AI と人の境界線をどう引くか。** Aigis で 5 日間 / 17 サイクル / 11 リリース (v1.0.1 → v1.0.12) を運用中。
 
 ---
 
@@ -49,7 +49,7 @@ N 個のドメインを mod N で順番に消化する。
 - 「今回は何やる？」のメタ判断を AI から奪うことで、判断ループの暴走を防ぐ
 - ドメイン一覧は人が手で書く（=人が境界を引く場所）
 
-**Aigis 実体**: `auto-improvement/ROTATION.md` の `NEXT_INDEX` (mod 10) + 10 セキュリティドメイン
+**Aigis 実体**: `auto-improvement/ROTATION.md` の `NEXT_INDEX` (mod 10) + 10 セキュリティドメイン (prompt-injection / agent-tool-abuse / data-exfiltration / jailbreak-extraction / memory-context / supply-chain-llm / multi-agent / evasion-obfuscation / compliance-regulation / incident-postmortems)
 
 ### ② 物質化された段階 (Materialize) — AI の思考を必ずファイルに落とす
 
@@ -71,26 +71,29 @@ N 個のドメインを mod N で順番に消化する。
 - API breaking → pending
 - 確信度が低い → pending
 
-**「やらない判断」を AI に許す**。Aigis の `pending/` には実際に 9 件積まれていて、人が触るまで眠っている。これがないと AI は「とにかく実装する」に倒れて事故る。
+**「やらない判断」を AI に許す**。Aigis の `pending/` には実際に **22 件**積まれていて、人が触るまで眠っている。これがないと AI は「とにかく実装する」に倒れて事故る。
 
 ---
 
-## 1サイクルの実況 (Aigis 実例 2026-05-13 03:00 UTC)
+## 1サイクルの実況 (Aigis 実例 2026-05-11T06-12 UTC, multi-agent ドメイン)
 
 ```
-03:00:00  cron が Claude Code を起動
-03:00:05  ROTATION.md を読む → NEXT_INDEX: 6 → "supply-chain-attacks"
-03:00:30  research/...md 作成 → arxiv/CVE を漁って 3 件発見
-03:15:00  changes/...md に実装案を記録
-03:20:00  patterns.py に regex を 3 件追加
-03:25:00  tests/ にテスト 4 件追加 → pytest 通る
-03:35:00  4 件目アイデアは 200 LOC 超 → pending/ へ隔離
-03:40:00  累積 ≥3 件で CHANGELOG 追記 + git tag v1.0.13
-03:45:00  GitHub Actions が tag → PyPI 自動公開
-03:45:30  INDEX.md に 1 行追記 → エージェント終了
+T+0:00   ROTATION.md を読む → NEXT_INDEX: 6 → "multi-agent"
+T+0:30   research/2026-05-11T06-12_6-multi-agent.md を新規作成
+           → arxiv / Unit42 / Keysight / LevelBlue から A2A protocol 攻撃を調査
+           → Agent Card Poisoning / Session Smuggling など 7 件の調査ソース
+T+15:00  changes/2026-05-11T06-12_changes.md に実装案を記録
+T+20:00  aigis/multi_agent/message_scanner.py に regex 2 グループ追加
+           _AGENT_CARD_POISONING_PATTERNS (3 rules, 19 LOC)
+           _SESSION_FABRICATION_PATTERNS  (3 rules, 21 LOC)
+T+25:00  tests/test_multi_agent.py に 8 ケース追加 → pytest 1222 pass
+T+27:00  Agent spoofing は metadata-layer 必須 → pending/ へ隔離 (2 件目)
+T+30:00  累積 5 件 (前回 supply-chain 3 + 今回 2) → v1.0.12 patch bump
+T+32:00  GitHub Actions が tag → PyPI 自動公開
+T+33:00  INDEX.md に 1 行追記 → エージェント終了
 ```
 
-これを **6 時間ごとに 27 回**繰り返した結果が v1.0.7 → v1.0.17, 137 ルール。
+これを **5 日間で 17 回**繰り返した結果が v1.0.1 → v1.0.12 と pending 17 件。
 
 ---
 

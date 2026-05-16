@@ -107,9 +107,9 @@ Forge Loop は中間を取る:
 
 | 判断 | 誰が | なぜ |
 |---|---|---|
-| 「今日は supply-chain-attacks ドメイン」 | 人 (ROTATION.md) | メタ判断、決定論で固定 |
-| 「LangChain CVE-2025-68664 を実装」 | AI | ドメイン内の中身、AI 裁量 |
-| 「regex はこの形」 | AI | 実装詳細、AI 裁量 |
+| 「今回は multi-agent ドメイン」 | 人 (ROTATION.md) | メタ判断、決定論で固定 |
+| 「Agent Card Poisoning regex を実装」 | AI | ドメイン内の中身、AI 裁量 |
+| 「regex はこの形 (`route\s+to`)」 | AI | 実装詳細、AI 裁量 |
 | 「200 LOC 超だから pending」 | 機械的指標 | LOC カウント |
 | 「累積 3 件で release」 | 機械的指標 | エントリ数カウント |
 | 「リリースノートに rule_id を必ず書く」 | 人 (skill 定義) | 監査可能性のため |
